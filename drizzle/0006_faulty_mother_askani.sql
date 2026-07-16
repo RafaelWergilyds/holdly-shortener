@@ -1,0 +1,1 @@
+ALTER TABLE "shorten_url" ADD COLUMN "clicks" integer DEFAULT 0 NOT NULL;

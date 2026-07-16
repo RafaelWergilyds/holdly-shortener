@@ -1,6 +1,7 @@
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "../db/connection";
 import { urlTable } from "../db/schema";
+import { redis } from "../db/redis";
 
 export class UrlRepository {
     async create(url: string) {
@@ -22,6 +23,10 @@ export class UrlRepository {
 
     async findByUrl(url: string) {
         return await db.select().from(urlTable).where(eq(urlTable.url, url));
+    }
+
+    async incrementClick(code: string) {
+        await redis.incr(`clicks:${code}`);
     }
 
 }

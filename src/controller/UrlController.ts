@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { UrlRepository } from "../repositories/urlRepository";
-import { UrlService } from "../service/urlService";
+import { UrlService } from "../services/urlService.ts";
 
 const repository = new UrlRepository();
 const service = new UrlService(repository);
@@ -35,4 +35,6 @@ export class UrlController {
             return reply.status(500).send(error)
         }
     }
+
+
 }
