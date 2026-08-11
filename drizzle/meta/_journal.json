@@ -50,6 +50,48 @@
       "when": 1784210148427,
       "tag": "0006_faulty_mother_askani",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1786476217260,
+      "tag": "0007_clean_tyrannus",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1786476303080,
+      "tag": "0008_remarkable_rattler",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1786476948322,
+      "tag": "0009_natural_human_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1786477103833,
+      "tag": "0010_swift_roulette",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1786478384646,
+      "tag": "0011_absent_tombstone",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1786479500716,
+      "tag": "0012_perpetual_caretaker",
+      "breakpoints": true
     }
   ]
 }
