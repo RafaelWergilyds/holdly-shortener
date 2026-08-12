@@ -1,40 +1,46 @@
-import { eq, and, gte } from "drizzle-orm";
-import { db } from "../db/connection";
-import { urlTable } from "../db/schema";
-import { redis } from "../db/redis";
+import { eq, and, gte } from 'drizzle-orm'
+import { db } from '../db/connection'
+import { urlTable } from '../db/schema'
+import { redis } from '../db/redis'
+import { newUrl } from '../model/url'
+
 export class UrlRepository {
-    async create(userId: string, url: string) {
-        const newUrl: typeof urlTable.$inferInsert = {
-            url,
-            userId
-        }
-
-        return await db.insert(urlTable).values(newUrl).returning();
+  async create(userId: string, url: string) {
+    const newUrl: newUrl = {
+      url,
+      userId,
     }
 
-    async findAll() {
-        return db.select().from(urlTable);
-    }
+    return await db.insert(urlTable).values(newUrl).returning()
+  }
 
-    async findById(id: number) {
-        const url = await db.select().from(urlTable).where(eq(urlTable.id, id))
-        return url.at(0);
-    }
+  async findAll() {
+    return db.select().from(urlTable)
+  }
 
-    async findByUrl(url: string) {
-        return await db.select().from(urlTable).where(eq(urlTable.url, url));
-    }
+  async findById(id: number) {
+    const url = await db.select().from(urlTable).where(eq(urlTable.id, id))
+    return url.at(0)
+  }
 
-    async findByUrlAndUserId(userId: string, url: string) {
-        return await db.select().from(urlTable).where(and(eq(urlTable.userId, userId), gte(urlTable.url, url)));
-    }
-    
-    async findByUserId(userId: string) {
-        return await db.select().from(urlTable).where(eq(urlTable.userId, userId));
-    }
+  async findByUrl(url: string) {
+    return await db.select().from(urlTable).where(eq(urlTable.url, url))
+  }
 
-    async incrementClick(code: string) {
-        await redis.incr(`clicks:${code}`);
-    }
+  async findByUrlAndUserId(userId: string, url: string) {
+    const urls = await db
+      .select()
+      .from(urlTable)
+      .where(and(eq(urlTable.userId, userId), eq(urlTable.url, url)))
 
+    return urls
+  }
+
+  async findByUserId(userId: string) {
+    return await db.select().from(urlTable).where(eq(urlTable.userId, userId))
+  }
+
+  async incrementClick(code: string) {
+    await redis.incr(`clicks:${code}`)
+  }
 }

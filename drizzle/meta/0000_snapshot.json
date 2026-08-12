@@ -48,16 +48,12 @@
         "shorten_url_code_unique": {
           "name": "shorten_url_code_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "code"
-          ]
+          "columns": ["code"]
         },
         "shorten_url_url_unique": {
           "name": "shorten_url_url_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "url"
-          ]
+          "columns": ["url"]
         }
       },
       "policies": {},

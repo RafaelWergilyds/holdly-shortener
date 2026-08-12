@@ -1,8 +1,20 @@
-import fastify from "fastify";
-import { routes } from "./routes/routes";
+import fastify from 'fastify'
+import fjwt from '@fastify/jwt'
+import { routes } from './routes/routes'
+import 'dotenv/config'
 
-const app = fastify();
+const EXP = process.env.JWT_EXPIRATION
+const SECRET = process.env.JWT_SECRET
 
-app.register(routes, {prefix: "/api"});
+const app = fastify()
 
-export default app;
+app.register(fjwt, {
+  secret: SECRET as string,
+  sign: {
+    expiresIn: EXP || '1d',
+  },
+})
+
+app.register(routes, { prefix: '/api' })
+
+export default app

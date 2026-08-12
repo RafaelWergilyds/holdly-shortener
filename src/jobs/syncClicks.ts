@@ -1,27 +1,27 @@
-import { eq, sql } from "drizzle-orm";
-import { db } from "../db/connection";
-import { redis } from "../db/redis";
-import { urlTable } from "../db/schema";
-import { decode } from "../utils/generateCode";
+import { eq, sql } from 'drizzle-orm'
+import { db } from '../db/connection'
+import { redis } from '../db/redis'
+import { urlTable } from '../db/schema'
+import { decode } from '../utils/generateCode'
 
 export async function syncClicks() {
-    const keys = await redis.keys('clicks:*');
-    
-    for(const key of keys){
-        const code = key.replace('clicks:', '');
-        const quantity = await redis.get(key);
+  const keys = await redis.keys('clicks:*')
 
-        if(!quantity) continue;
-        
-        const id = decode(code);
+  for (const key of keys) {
+    const code = key.replace('clicks:', '')
+    const quantity = await redis.get(key)
 
-        if(!id) continue;
+    if (!quantity) continue
 
-        await db.update(urlTable)
-            .set({ clicks: sql`${urlTable.clicks} + ${Number(quantity)}`})
-            .where(eq(urlTable.id, id));
+    const id = decode(code)
 
-        await redis.del(key);
-    }
+    if (!id) continue
 
+    await db
+      .update(urlTable)
+      .set({ clicks: sql`${urlTable.clicks} + ${Number(quantity)}` })
+      .where(eq(urlTable.id, id))
+
+    await redis.del(key)
+  }
 }

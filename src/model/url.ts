@@ -1,3 +1,5 @@
-import { urlTable } from "../db/schema";
+import { InferInsertModel, InferSelectModel } from 'drizzle-orm'
+import { urlTable } from '../db/schema'
 
-export type Url = typeof urlTable.$inferSelect
+export type Url = InferSelectModel<typeof urlTable>
+export type newUrl = InferInsertModel<typeof urlTable>

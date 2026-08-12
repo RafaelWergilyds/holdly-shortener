@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch src/server.ts"
+    "dev": "tsx watch src/server.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "keywords": [],
   "author": "",
@@ -13,10 +15,12 @@
   "type": "module",
   "devDependencies": {
     "@types/node": "^26.1.1",
+    "prettier": "^3.9.6",
     "tsx": "^4.23.1",
     "typescript": "^7.0.2"
   },
   "dependencies": {
+    "@fastify/jwt": "^10.2.1",
     "@types/pg": "^8.20.0",
     "argon2": "^0.45.1",
     "base62": "^2.0.2",

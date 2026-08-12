@@ -1,96 +1,91 @@
-import { UrlRepository } from "../repositories/urlRepository";
-import { decode, generateCode } from "../utils/generateCode";
+import { UrlRepository } from '../repositories/urlRepository'
+import { decode, generateCode } from '../utils/generateCode'
 
 type UrlResponse = {
-    code: string
-    url: string
-    userId: string
-    clicks: number
+  code: string
+  url: string
+  userId: string
+  clicks: number
 }
 
 export class UrlService {
-    urlRepository: UrlRepository;
+  constructor(private urlRepository: UrlRepository) {}
 
-    constructor(urlRepository: UrlRepository){
-        this.urlRepository = urlRepository;
+  async createUrl(userId: string, url: string): Promise<UrlResponse> {
+    const findUrl = await this.urlRepository.findByUrlAndUserId(userId, url)
+
+    if (findUrl.length !== 0) throw new Error('Url already exists')
+
+    const newUrl = await this.urlRepository.create(userId, url)
+
+    const code = generateCode(newUrl[0].id)
+
+    const urlResponse: UrlResponse = {
+      code,
+      url: newUrl[0].url,
+      userId: newUrl[0].userId,
+      clicks: newUrl[0].clicks,
     }
 
-    async createUrl(userId: string, url: string): Promise<UrlResponse>{
-        const findUrl = await this.urlRepository.findByUrlAndUserId(userId, url);
+    return urlResponse
+  }
 
-        if(findUrl.length !== 0) throw new Error('Url already exists');
+  async getAllUrls(): Promise<UrlResponse[]> {
+    const urls = await this.urlRepository.findAll()
+    const urlsResponse: UrlResponse[] = []
 
-        const newUrl = await this.urlRepository.create(userId, url);
+    urls.forEach((url) => {
+      const code = generateCode(url.id)
+      const urlResponse = {
+        code,
+        url: url.url,
+        userId: url.userId,
+        clicks: url.clicks,
+      }
 
-        const code = generateCode(newUrl[0].id);
+      urlsResponse.push(urlResponse)
+    })
 
-        const urlResponse: UrlResponse ={
-            code,
-            url: newUrl[0].url,
-            userId: newUrl[0].userId,
-            clicks: newUrl[0].clicks
-        }
+    return urlsResponse
+  }
 
-        return urlResponse;
+  async findUrlByCode(code: string): Promise<UrlResponse> {
+    try {
+      const id = decode(code)
+      const findUrl = await this.urlRepository.findById(id)
+
+      if (!findUrl) throw new Error('Url not found')
+
+      await this.urlRepository.incrementClick(code)
+
+      const url: UrlResponse = {
+        code,
+        url: findUrl.url,
+        userId: findUrl.userId,
+        clicks: findUrl.clicks,
+      }
+
+      return url
+    } catch (error) {
+      throw error
     }
+  }
 
-    async getAllUrls(): Promise<UrlResponse[]>{
-        const urls = await this.urlRepository.findAll();
-        const urlsResponse: UrlResponse[] = [];
+  async findUrlsByUserId(userId: string): Promise<UrlResponse[]> {
+    const urls = await this.urlRepository.findByUserId(userId)
+    const urlsResponse: UrlResponse[] = []
 
-        urls.forEach(url => {
-            const code = generateCode(url.id);
-            const urlResponse = {
-                code,
-                url: url.url,
-                userId: url.userId,
-                clicks: url.clicks
-            };
+    urls.forEach((url) => {
+      const code = generateCode(url.id)
+      const urlResponse = {
+        code,
+        url: url.url,
+        userId: url.userId,
+        clicks: url.clicks,
+      }
+      urlsResponse.push(urlResponse)
+    })
 
-            urlsResponse.push(urlResponse);
-        })
-
-        return urlsResponse;
-    }
-
-    async findUrlByCode(code: string): Promise<UrlResponse>{
-        try {
-            const id = decode(code)
-            const findUrl = await this.urlRepository.findById(id);
-    
-            if(!findUrl) throw new Error('Url not found');
-    
-            await this.urlRepository.incrementClick(code);
-    
-            const url: UrlResponse = {
-                code,
-                url: findUrl.url,
-                userId: findUrl.userId,
-                clicks: findUrl.clicks
-            }
-    
-            return url;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async findUrlsByUserId(userId: string): Promise<UrlResponse[]> {
-        const urls = await this.urlRepository.findByUserId(userId);
-        const urlsResponse: UrlResponse[] = [];
-
-        urls.forEach(url => {
-            const code = generateCode(url.id);
-            const urlResponse = {
-                code,
-                url: url.url,
-                userId: url.userId,
-                clicks: url.clicks
-            };
-            urlsResponse.push(urlResponse);
-        });
-
-        return urlsResponse;
-    }
-
+    return urlsResponse
+  }
 }
