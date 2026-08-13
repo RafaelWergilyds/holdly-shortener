@@ -1,6 +1,6 @@
 import fastify from 'fastify'
 import fjwt from '@fastify/jwt'
-import { routes } from './routes/routes'
+import { routes } from './routes/routes.ts'
 import 'dotenv/config'
 
 const EXP = process.env.JWT_EXPIRATION

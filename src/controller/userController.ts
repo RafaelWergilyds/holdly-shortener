@@ -29,8 +29,8 @@ export class UserController {
     }
   }
 
-  async findUserById(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-    const { id } = request.params
+  async findUserById(request: FastifyRequest, reply: FastifyReply) {
+    const { id } = request.params as { id: string }
 
     try {
       const response = await service.findUserById(id)

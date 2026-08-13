@@ -1,6 +1,7 @@
-import app from './app'
+import app from './app.ts'
 import 'dotenv/config'
-import { syncClicks } from './jobs/syncClicks'
+import { syncClicks } from './jobs/syncClicks.ts'
+
 
 const PORT = process.env.PORT || 3000
 
@@ -14,5 +15,5 @@ app
   })
 
 setInterval(() => {
-  syncClicks().catch((err) => console.error('Error synchronizing clicks:', err))
+  syncClicks().catch((err: Error) => console.error('Error synchronizing clicks:', err))
 }, 60_000)
