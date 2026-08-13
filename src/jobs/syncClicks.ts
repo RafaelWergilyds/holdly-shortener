@@ -1,8 +1,8 @@
 import { eq, sql } from 'drizzle-orm'
-import { db } from '../db/connection'
-import { redis } from '../db/redis'
-import { urlTable } from '../db/schema'
-import { decode } from '../utils/generateCode'
+import { db } from '../db/connection.ts'
+import { redis } from '../db/redis.ts'
+import { urlTable } from '../db/schema.ts'
+import { decode } from '../utils/generateCode.ts'
 
 export async function syncClicks() {
   const keys = await redis.keys('clicks:*')

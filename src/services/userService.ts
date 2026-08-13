@@ -1,17 +1,13 @@
 import argon2 from 'argon2'
-import { UserRepository } from '../repositories/userRepository'
+import { UserRepository } from '../repositories/userRepository.ts'
+import { User } from '../model/user.ts'
 
-type UserResponse = {
-  id: string
-  name: string
-  email: string
-  createdAt: Date
-}
+type UserResponse = Omit<User, 'password' | 'updatedAt'>
 
 export class UserService {
   constructor(private userRepository: UserRepository) {}
 
-  async createUser(name: string, email: string, password: string) {
+  async createUser(name: string, email: string, password: string): Promise<UserResponse> {
     const findUser = await this.userRepository.findByEmail(email)
 
     if (findUser) throw new Error('User already exists')
@@ -19,7 +15,15 @@ export class UserService {
     const passwordHash = await argon2.hash(password)
 
     const newUser = await this.userRepository.create(name, email, passwordHash)
-    return newUser
+
+    const userResponse: UserResponse = {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      createdAt: newUser.createdAt,
+    }
+
+    return userResponse
   }
 
   async findAllUsers(): Promise<UserResponse[]> {

@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify'
-import { UserRepository } from '../repositories/userRepository'
+import { UserRepository } from '../repositories/userRepository.ts'
 import argon2 from 'argon2'
+import fjwt from '@fastify/jwt'
 
 export class AuthService {
   constructor(private userRepository: UserRepository) {}

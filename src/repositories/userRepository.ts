@@ -1,28 +1,32 @@
 import { eq } from 'drizzle-orm'
-import { db } from '../db/connection'
-import { userTable } from '../db/schema'
+import { db } from '../db/connection.ts'
+import { userTable } from '../db/schema.ts'
+import { newUser, User } from '../model/user.ts'
 
 export class UserRepository {
-  async create(name: string, email: string, password: string) {
-    const newUser: typeof userTable.$inferInsert = {
+  async create(name: string, email: string, password: string): Promise<User> {
+    const newUser = {
       name,
       email,
       password,
     }
-    return await db.insert(userTable).values(newUser).returning()
+
+    const createdUser = await db.insert(userTable).values(newUser).returning()
+
+    return createdUser[0]
   }
 
-  async findAll() {
+  async findAll(): Promise<User[]> {
     return db.select().from(userTable)
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<User> {
     const user = await db.select().from(userTable).where(eq(userTable.email, email))
-    return user.at(0)
+    return user[0]
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<User> {
     const user = await db.select().from(userTable).where(eq(userTable.id, id))
-    return user.at(0)
+    return user[0]
   }
 }

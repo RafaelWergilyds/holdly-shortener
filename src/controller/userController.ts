@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { UserService } from '../services/userService'
-import { UserRepository } from '../repositories/userRepository'
+import { UserService } from '../services/userService.ts'
+import { UserRepository } from '../repositories/userRepository.ts'
 
 const repository = new UserRepository()
 const service = new UserService(repository)

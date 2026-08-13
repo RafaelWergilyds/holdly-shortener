@@ -1,8 +1,8 @@
 import { FastifyInstance } from 'fastify'
-import { UrlController } from '../controller/urlController'
-import { UserController } from '../controller/userController'
-import { AuthController } from '../controller/authController'
-import { authMiddleware } from '../middleware/authMiddleware'
+import { UrlController } from '../controller/urlController.ts'
+import { UserController } from '../controller/userController.ts'
+import { AuthController } from '../controller/authController.ts'
+import { authMiddleware } from '../middleware/authMiddleware.ts'
 
 const urlController = new UrlController()
 const userController = new UserController()

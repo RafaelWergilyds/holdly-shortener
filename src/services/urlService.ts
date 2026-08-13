@@ -1,5 +1,5 @@
-import { UrlRepository } from '../repositories/urlRepository'
-import { decode, generateCode } from '../utils/generateCode'
+import { UrlRepository } from '../repositories/urlRepository.ts'
+import { decode, generateCode } from '../utils/generateCode.ts'
 
 type UrlResponse = {
   code: string
@@ -18,13 +18,13 @@ export class UrlService {
 
     const newUrl = await this.urlRepository.create(userId, url)
 
-    const code = generateCode(newUrl[0].id)
+    const code = generateCode(newUrl.id)
 
     const urlResponse: UrlResponse = {
       code,
-      url: newUrl[0].url,
-      userId: newUrl[0].userId,
-      clicks: newUrl[0].clicks,
+      url: newUrl.url,
+      userId: newUrl.userId,
+      clicks: newUrl.clicks,
     }
 
     return urlResponse

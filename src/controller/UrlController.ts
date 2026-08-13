@@ -39,9 +39,9 @@ export class UrlController {
     const { code } = request.params
 
     try {
-      const url = await service.findUrlByCode(code)
+      const response = await service.findUrlByCode(code)
 
-      return reply.status(301).redirect(url.url)
+      return reply.status(301).redirect(response.url)
     } catch (error) {
       return reply.status(500).send(error)
     }
