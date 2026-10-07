@@ -1,6 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { UrlRepository } from '../repositories/urlRepository.ts'
 import { UrlService } from '../services/urlService.ts'
+import { NotFoundError } from '../errors.ts'
 
 const repository = new UrlRepository()
 const service = new UrlService(repository)
@@ -41,8 +42,11 @@ export class UrlController {
     try {
       const response = await service.findUrlByCode(code)
 
-      return reply.status(301).redirect(response.url)
+      return reply.redirect(response.url, 302)
     } catch (error) {
+      if (error instanceof NotFoundError) {
+        return reply.status(404).send({ error: error.message })
+      }
       return reply.status(500).send(error)
     }
   }

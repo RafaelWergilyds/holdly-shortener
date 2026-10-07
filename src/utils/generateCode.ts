@@ -13,9 +13,18 @@ export function generateCode(id: number): string {
   return hashed
 }
 
-export function decode(encoded: string): number {
-  const decoded = hash.decode(encoded)
-  const id = decoded[0]
+const MAX_INT4 = 2_147_483_647
 
-  return Number(id)
+export function decode(encoded: string): number | null {
+  try {
+    const [decoded] = hash.decode(encoded)
+    if (decoded === undefined) return null
+
+    const id = Number(decoded)
+    if (!Number.isInteger(id) || id < 1 || id > MAX_INT4) return null
+
+    return id
+  } catch {
+    return null
+  }
 }

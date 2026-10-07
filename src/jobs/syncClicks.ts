@@ -4,24 +4,32 @@ import { redis } from '../db/redis.ts'
 import { urlTable } from '../db/schema.ts'
 import { decode } from '../utils/generateCode.ts'
 
+let isRunning = false
+
 export async function syncClicks() {
-  const keys = await redis.keys('clicks:*')
+  if (isRunning) return
+  isRunning = true
 
-  for (const key of keys) {
-    const code = key.replace('clicks:', '')
-    const quantity = await redis.get(key)
+  try {
+    const stream = redis.scanStream({ match: 'clicks:*', count: 100 })
 
-    if (!quantity) continue
+    for await (const keys of stream as AsyncIterable<string[]>) {
+      for (const key of keys) {
+        const quantity = await redis.getdel(key)
 
-    const id = decode(code)
+        if (!quantity) continue
 
-    if (!id) continue
+        const id = decode(key.replace('clicks:', ''))
 
-    await db
-      .update(urlTable)
-      .set({ clicks: sql`${urlTable.clicks} + ${Number(quantity)}` })
-      .where(eq(urlTable.id, id))
+        if (!id) continue
 
-    await redis.del(key)
+        await db
+          .update(urlTable)
+          .set({ clicks: sql`${urlTable.clicks} + ${Number(quantity)}` })
+          .where(eq(urlTable.id, id))
+      }
+    }
+  } finally {
+    isRunning = false
   }
 }

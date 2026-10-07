@@ -1,5 +1,6 @@
 import { UrlRepository } from '../repositories/urlRepository.ts'
 import { decode, generateCode } from '../utils/generateCode.ts'
+import { NotFoundError } from '../errors.ts'
 
 type UrlResponse = {
   code: string
@@ -50,25 +51,22 @@ export class UrlService {
   }
 
   async findUrlByCode(code: string): Promise<UrlResponse> {
-    try {
-      const id = decode(code)
-      const findUrl = await this.urlRepository.findById(id)
+    const id = decode(code)
+    if (id === null) throw new NotFoundError('Url not found')
 
-      if (!findUrl) throw new Error('Url not found')
+    const findUrl = await this.urlRepository.findById(id)
+    if (!findUrl) throw new NotFoundError('Url not found')
 
-      await this.urlRepository.incrementClick(code)
+    await this.urlRepository.incrementClick(code)
 
-      const url: UrlResponse = {
-        code,
-        url: findUrl.url,
-        userId: findUrl.userId,
-        clicks: findUrl.clicks,
-      }
-
-      return url
-    } catch (error) {
-      throw error
+    const url: UrlResponse = {
+      code,
+      url: findUrl.url,
+      userId: findUrl.userId,
+      clicks: findUrl.clicks,
     }
+
+    return url
   }
 
   async findUrlsByUserId(userId: string): Promise<UrlResponse[]> {
