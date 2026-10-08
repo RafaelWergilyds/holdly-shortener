@@ -1,6 +1,7 @@
 import { UrlRepository } from '../repositories/urlRepository.ts'
 import { decode, generateCode } from '../utils/generateCode.ts'
-import { NotFoundError } from '../errors.ts'
+import { ConflictError, NotFoundError } from '../errors.ts'
+import { Url } from '../model/url.ts'
 
 type UrlResponse = {
   code: string
@@ -9,45 +10,26 @@ type UrlResponse = {
   clicks: number
 }
 
+function toUrlResponse(url: Url): UrlResponse {
+  return {
+    code: generateCode(url.id),
+    url: url.url,
+    userId: url.userId,
+    clicks: url.clicks,
+  }
+}
+
 export class UrlService {
   constructor(private urlRepository: UrlRepository) {}
 
   async createUrl(userId: string, url: string): Promise<UrlResponse> {
     const findUrl = await this.urlRepository.findByUrlAndUserId(userId, url)
 
-    if (findUrl.length !== 0) throw new Error('Url already exists')
+    if (findUrl.length !== 0) throw new ConflictError('Url already exists')
 
     const newUrl = await this.urlRepository.create(userId, url)
 
-    const code = generateCode(newUrl.id)
-
-    const urlResponse: UrlResponse = {
-      code,
-      url: newUrl.url,
-      userId: newUrl.userId,
-      clicks: newUrl.clicks,
-    }
-
-    return urlResponse
-  }
-
-  async getAllUrls(): Promise<UrlResponse[]> {
-    const urls = await this.urlRepository.findAll()
-    const urlsResponse: UrlResponse[] = []
-
-    urls.forEach((url) => {
-      const code = generateCode(url.id)
-      const urlResponse = {
-        code,
-        url: url.url,
-        userId: url.userId,
-        clicks: url.clicks,
-      }
-
-      urlsResponse.push(urlResponse)
-    })
-
-    return urlsResponse
+    return toUrlResponse(newUrl)
   }
 
   async findUrlByCode(code: string): Promise<UrlResponse> {
@@ -59,31 +41,12 @@ export class UrlService {
 
     await this.urlRepository.incrementClick(code)
 
-    const url: UrlResponse = {
-      code,
-      url: findUrl.url,
-      userId: findUrl.userId,
-      clicks: findUrl.clicks,
-    }
-
-    return url
+    return toUrlResponse(findUrl)
   }
 
   async findUrlsByUserId(userId: string): Promise<UrlResponse[]> {
     const urls = await this.urlRepository.findByUserId(userId)
-    const urlsResponse: UrlResponse[] = []
 
-    urls.forEach((url) => {
-      const code = generateCode(url.id)
-      const urlResponse = {
-        code,
-        url: url.url,
-        userId: url.userId,
-        clicks: url.clicks,
-      }
-      urlsResponse.push(urlResponse)
-    })
-
-    return urlsResponse
+    return urls.map(toUrlResponse)
   }
 }

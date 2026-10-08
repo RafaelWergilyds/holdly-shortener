@@ -1,8 +1,8 @@
 import Hashids from 'hashids'
-import 'dotenv/config'
+import { env } from '../env.ts'
 
 const hash = new Hashids(
-  process.env.SECRET,
+  env.HASHIDS_SALT,
   7,
   'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890',
 )

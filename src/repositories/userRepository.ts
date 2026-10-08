@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { db } from '../db/connection.ts'
 import { userTable } from '../db/schema.ts'
-import { newUser, User } from '../model/user.ts'
+import { User } from '../model/user.ts'
 
 export class UserRepository {
   async create(name: string, email: string, password: string): Promise<User> {
@@ -16,16 +16,12 @@ export class UserRepository {
     return createdUser[0]
   }
 
-  async findAll(): Promise<User[]> {
-    return db.select().from(userTable)
-  }
-
-  async findByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<User | undefined> {
     const user = await db.select().from(userTable).where(eq(userTable.email, email))
     return user[0]
   }
 
-  async findById(id: string): Promise<User> {
+  async findById(id: string): Promise<User | undefined> {
     const user = await db.select().from(userTable).where(eq(userTable.id, id))
     return user[0]
   }

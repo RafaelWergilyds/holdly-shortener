@@ -1,42 +1,31 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { UserService } from '../services/userService.ts'
 import { UserRepository } from '../repositories/userRepository.ts'
+import { ForbiddenError } from '../errors.ts'
+import { CreateUserBody, UserIdParams } from '../validations/schemas.ts'
 
 const repository = new UserRepository()
 const service = new UserService(repository)
 
 export class UserController {
-  async createUser(
-    request: FastifyRequest<{ Body: { email: string; password: string; name: string } }>,
-    reply: FastifyReply,
-  ) {
+  async createUser(request: FastifyRequest<{ Body: CreateUserBody }>, reply: FastifyReply) {
     const { email, password, name } = request.body
 
-    try {
-      const response = await service.createUser(name, email, password)
-      return reply.status(201).send(response)
-    } catch (error) {
-      return reply.status(500).send(error)
-    }
+    const response = await service.createUser(name, email, password)
+    return reply.status(201).send(response)
   }
 
-  async findAllUsers(_: FastifyRequest, reply: FastifyReply) {
-    try {
-      const response = await service.findAllUsers()
-      return reply.status(200).send(response)
-    } catch (error) {
-      return reply.status(500).send(error)
-    }
+  async findMe(request: FastifyRequest, reply: FastifyReply) {
+    const response = await service.findUserById(request.user.id)
+    return reply.status(200).send(response)
   }
 
-  async findUserById(request: FastifyRequest, reply: FastifyReply) {
-    const { id } = request.params as { id: string }
+  async findUserById(request: FastifyRequest<{ Params: UserIdParams }>, reply: FastifyReply) {
+    const { id } = request.params
 
-    try {
-      const response = await service.findUserById(id)
-      return reply.status(200).send(response)
-    } catch (error) {
-      return reply.status(500).send(error)
-    }
+    if (id !== request.user.id) throw new ForbiddenError()
+
+    const response = await service.findUserById(id)
+    return reply.status(200).send(response)
   }
 }

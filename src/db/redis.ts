@@ -1,8 +1,9 @@
 import { Redis } from 'ioredis'
+import { env } from '../env.ts'
 
 export const redis = new Redis({
-  host: process.env.REDIS_HOST ?? 'localhost',
-  port: Number(process.env.REDIS_PORT ?? 6379),
+  host: env.REDIS_HOST,
+  port: env.REDIS_PORT,
 })
 
 redis.on('error', (err: Error) => console.error('Error Redis:', err))

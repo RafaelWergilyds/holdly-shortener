@@ -1,9 +1,10 @@
-import { FastifyReply, FastifyRequest } from 'fastify'
+import { FastifyRequest } from 'fastify'
+import { UnauthorizedError } from '../errors.ts'
 
-export async function authMiddleware(request: FastifyRequest, reply: FastifyReply) {
+export async function authMiddleware(request: FastifyRequest) {
   try {
     await request.jwtVerify()
-  } catch (error) {
-    return reply.status(401).send({ message: 'Invalid token' })
+  } catch {
+    throw new UnauthorizedError('Invalid token')
   }
 }

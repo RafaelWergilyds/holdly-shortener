@@ -4,7 +4,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: holdly
-      POSTGRES_PASSWORD: 4123
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-4123}
       POSTGRES_DB: holdly-db
     ports:
       - '5432:5432'
